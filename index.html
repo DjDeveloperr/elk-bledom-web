@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ELK‑BLEDOM Controller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        color-scheme: dark light;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-neutral-950 text-neutral-100">
+    <div class="max-w-3xl mx-auto p-6">
+      <header class="mb-6">
+        <h1 class="text-2xl font-semibold">ELK‑BLEDOM Controller</h1>
+        <p class="text-neutral-400">
+          Control Lotus Lantern / ELK‑BLEDOM LED strips via Web Bluetooth.
+        </p>
+      </header>
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <section
+          class="md:col-span-3 bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow"
+        >
+          <div class="flex flex-wrap items-center gap-3">
+            <button
+              id="btnConnect"
+              class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 active:scale-[.99]"
+            >
+              Connect
+            </button>
+            <button
+              id="btnDisconnect"
+              class="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 border border-neutral-700"
+            >
+              Disconnect
+            </button>
+            <div class="grow"></div>
+            <div id="status" class="text-sm text-neutral-400">
+              Not connected
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow"
+        >
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="font-medium">Power</h2>
+            <label class="inline-flex items-center cursor-pointer select-none">
+              <input id="powerToggle" type="checkbox" class="peer sr-only" />
+              <span
+                class="w-12 h-6 bg-neutral-700 rounded-full relative transition peer-checked:bg-emerald-600"
+              >
+                <span
+                  class="absolute w-5 h-5 bg-white rounded-full top-0.5 left-0.5 transition-transform duration-200 peer-checked:translate-x-6"
+                ></span>
+              </span>
+            </label>
+          </div>
+          <div class="grid grid-cols-5 gap-2 mt-2">
+            <button
+              data-color="#FF0000"
+              class="colorBtn h-8 rounded-xl"
+              style="background: #ff0000"
+            ></button>
+            <button
+              data-color="#00FF00"
+              class="colorBtn h-8 rounded-xl"
+              style="background: #00ff00"
+            ></button>
+            <button
+              data-color="#0000FF"
+              class="colorBtn h-8 rounded-xl"
+              style="background: #0000ff"
+            ></button>
+            <button
+              data-color="#FFFFFF"
+              class="colorBtn h-8 rounded-xl border border-neutral-700"
+              style="background: #ffffff"
+            ></button>
+            <button
+              data-color="#FFA500"
+              class="colorBtn h-8 rounded-xl"
+              style="background: #ffa500"
+            ></button>
+          </div>
+        </section>
+
+        <section
+          class="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow"
+        >
+          <h2 class="font-medium mb-3">Color</h2>
+          <input
+            id="color"
+            type="color"
+            value="#00aaff"
+            class="w-full h-12 rounded-xl overflow-hidden border border-neutral-800 bg-neutral-800"
+          />
+          <p class="text-xs text-neutral-400 mt-2">Applies immediately.</p>
+        </section>
+
+        <section
+          class="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow"
+        >
+          <h2 class="font-medium mb-3">Brightness</h2>
+          <input
+            id="brightness"
+            type="range"
+            min="0"
+            max="100"
+            value="100"
+            class="w-full"
+          />
+          <div class="text-right text-sm text-neutral-400 mt-1">
+            <span id="bVal">100</span>%
+          </div>
+        </section>
+
+        <section
+          class="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow"
+        >
+          <h2 class="font-medium mb-3">Pattern</h2>
+          <select
+            id="pattern"
+            class="w-full bg-neutral-800 border border-neutral-700 rounded-xl p-2"
+          >
+            <option value="-1">— Solid Color (no pattern) —</option>
+            <!-- Patterns 0..28 -->
+            <option value="0">Pattern 0</option>
+            <option value="1">Pattern 1</option>
+            <option value="2">Pattern 2</option>
+            <option value="3">Pattern 3</option>
+            <option value="4">Pattern 4</option>
+            <option value="5">Pattern 5</option>
+            <option value="6">Pattern 6</option>
+            <option value="7">Pattern 7</option>
+            <option value="8">Pattern 8</option>
+            <option value="9">Pattern 9</option>
+            <option value="10">Pattern 10</option>
+            <option value="11">Pattern 11</option>
+            <option value="12">Pattern 12</option>
+            <option value="13">Pattern 13</option>
+            <option value="14">Pattern 14</option>
+            <option value="15">Pattern 15</option>
+            <option value="16">Pattern 16</option>
+            <option value="17">Pattern 17</option>
+            <option value="18">Pattern 18</option>
+            <option value="19">Pattern 19</option>
+            <option value="20">Pattern 20</option>
+            <option value="21">Pattern 21</option>
+            <option value="22">Pattern 22</option>
+            <option value="23">Pattern 23</option>
+            <option value="24">Pattern 24</option>
+            <option value="25">Pattern 25</option>
+            <option value="26">Pattern 26</option>
+            <option value="27">Pattern 27</option>
+            <option value="28">Pattern 28</option>
+          </select>
+          <div class="mt-4">
+            <label class="text-sm text-neutral-300">Speed</label>
+            <input
+              id="speed"
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+              class="w-full"
+            />
+            <div class="text-right text-sm text-neutral-400 mt-1">
+              <span id="sVal">50</span>%
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="md:col-span-3 bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow"
+        >
+          <details>
+            <summary class="cursor-pointer text-neutral-300">
+              Protocol & device info
+            </summary>
+            <ul
+              class="mt-2 text-sm text-neutral-400 list-disc list-inside space-y-1"
+            >
+              <li>
+                Service UUID: <code>0000fff0-0000-1000-8000-00805f9b34fb</code>
+              </li>
+              <li>
+                Write Characteristic:
+                <code>0000fff3-0000-1000-8000-00805f9b34fb</code>
+              </li>
+              <li>
+                All frames are 9 bytes. Header <code>0x7E</code>, footer
+                <code>0xEF</code>.
+              </li>
+            </ul>
+          </details>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const SVC = "0000fff0-0000-1000-8000-00805f9b34fb";
+      const CHR = "0000fff3-0000-1000-8000-00805f9b34fb";
+
+      let device, server, service, characteristic;
+
+      const $ = (sel) => document.querySelector(sel);
+      const statusEl = $("#status");
+      const btnConnect = $("#btnConnect");
+      const btnDisconnect = $("#btnDisconnect");
+      const powerToggle = $("#powerToggle");
+      const colorInput = $("#color");
+      const brightnessInput = $("#brightness");
+      const bVal = $("#bVal");
+      const patternSel = $("#pattern");
+      const speedInput = $("#speed");
+      const sVal = $("#sVal");
+
+      function toUint8(arr) {
+        return new Uint8Array(arr);
+      }
+
+      async function writePacket(bytes) {
+        if (!characteristic) throw new Error("Not connected");
+        try {
+          if ("writeValueWithoutResponse" in characteristic) {
+            await characteristic.writeValueWithoutResponse(toUint8(bytes));
+          } else {
+            await characteristic.writeValue(toUint8(bytes));
+          }
+        } catch (e) {
+          console.error(e);
+          toast("Write failed: " + e.message);
+        }
+      }
+
+      // --- Packets (9 bytes) ---
+      function pktPower(on) {
+        return [
+          0x7e,
+          0x04,
+          0x04,
+          on ? 0x01 : 0x00,
+          0x00,
+          on ? 0x01 : 0x00,
+          0xff,
+          0x00,
+          0xef,
+        ];
+      }
+      function pktColor(r, g, b) {
+        return [
+          0x7e,
+          0x07,
+          0x05,
+          0x03,
+          r & 0xff,
+          g & 0xff,
+          b & 0xff,
+          0x10,
+          0xef,
+        ];
+      }
+      function pktBrightness(v) {
+        // 0..100
+        const vv = Math.max(0, Math.min(100, v | 0));
+        return [0x7e, 0x04, 0x01, vv, 0xff, 0xff, 0xff, 0x00, 0xef];
+      }
+      function pktPattern(idx) {
+        // 0..28
+        return [
+          0x7e,
+          0x05,
+          0x03,
+          0x80 + (idx | 0),
+          0x03,
+          0xff,
+          0xff,
+          0x00,
+          0xef,
+        ];
+      }
+      function pktSpeed(v) {
+        // 0..100
+        const vv = Math.max(0, Math.min(100, v | 0));
+        return [0x7e, 0x04, 0x02, vv, 0xff, 0xff, 0xff, 0x00, 0xef];
+      }
+
+      function hexColorToRgb(hex) {
+        const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex);
+        if (!m) return { r: 0, g: 0, b: 0 };
+        return {
+          r: parseInt(m[1], 16),
+          g: parseInt(m[2], 16),
+          b: parseInt(m[3], 16),
+        };
+      }
+
+      function setStatus(msg) {
+        statusEl.textContent = msg;
+      }
+
+      function toast(msg) {
+        setStatus(msg);
+      }
+
+      async function connect() {
+        if (!("bluetooth" in navigator)) {
+          toast("Web Bluetooth not supported in this browser.");
+          return;
+        }
+        try {
+          device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: [SVC],
+          });
+          device.addEventListener("gattserverdisconnected", onDisconnected);
+          setStatus("Connecting to " + (device.name || "device") + " ...");
+          server = await device.gatt.connect();
+          service = await server.getPrimaryService(SVC);
+          characteristic = await service.getCharacteristic(CHR);
+          setStatus("Connected to " + (device.name || device.id));
+          // Ensure power ON by default (optional)
+          await writePacket(pktPower(true));
+          // Apply initial UI state
+          await onColorChange();
+          await onBrightnessChange();
+        } catch (e) {
+          console.error(e);
+          toast("Connection failed: " + e.message);
+        }
+      }
+
+      async function disconnect() {
+        try {
+          if (device && device.gatt.connected) {
+            device.gatt.disconnect();
+          }
+        } catch {}
+      }
+
+      function onDisconnected() {
+        setStatus("Disconnected");
+        characteristic = null;
+        service = null;
+        server = null;
+        device = null;
+      }
+
+      // --- UI handlers ---
+      async function onPowerToggle() {
+        await writePacket(pktPower(powerToggle.checked));
+      }
+
+      async function onColorChange() {
+        const { r, g, b } = hexColorToRgb(colorInput.value);
+        await writePacket(pktColor(r, g, b));
+      }
+
+      let bDebounce;
+      async function onBrightnessChange() {
+        bVal.textContent = brightnessInput.value;
+        clearTimeout(bDebounce);
+        bDebounce = setTimeout(
+          () => writePacket(pktBrightness(+brightnessInput.value)),
+          100
+        );
+      }
+
+      let sDebounce;
+      async function onSpeedChange() {
+        sVal.textContent = speedInput.value;
+        clearTimeout(sDebounce);
+        sDebounce = setTimeout(
+          () => writePacket(pktSpeed(+speedInput.value)),
+          100
+        );
+      }
+
+      async function onPatternChange() {
+        const idx = +patternSel.value;
+        if (idx >= 0) {
+          await writePacket(pktPattern(idx));
+        }
+      }
+
+      // --- Wire up ---
+      btnConnect.addEventListener("click", connect);
+      btnDisconnect.addEventListener("click", disconnect);
+      powerToggle.addEventListener("change", onPowerToggle);
+      colorInput.addEventListener("input", onColorChange);
+      brightnessInput.addEventListener("input", onBrightnessChange);
+      speedInput.addEventListener("input", onSpeedChange);
+      patternSel.addEventListener("change", onPatternChange);
+      document.querySelectorAll(".colorBtn").forEach((btn) =>
+        btn.addEventListener("click", (e) => {
+          const hex = e.currentTarget.dataset.color;
+          colorInput.value = hex;
+          onColorChange();
+        })
+      );
+    </script>
+  </body>
+</html>
